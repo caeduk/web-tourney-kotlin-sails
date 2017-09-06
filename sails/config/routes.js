@@ -54,8 +54,9 @@ module.exports.routes = {
             return res.serverError(err);
           }
           var bracket = tourney.createBracket(times);
-          console.log(tourney.findMatch(bracket, 3));
-           return res.view('entidade', {data : times});
+          tourney.addResultado(bracket, 5, 16, 5);
+          console.log(tourney.findMatch(bracket, 5));
+          return res.view('entidade', {data : times});
       });
   },
 
