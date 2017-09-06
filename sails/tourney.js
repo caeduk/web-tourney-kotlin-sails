@@ -2,6 +2,8 @@
   'use strict';
   var println = Kotlin.kotlin.io.println_s8jyv4$;
   var Exception = Kotlin.kotlin.Exception;
+  var Iterator = Kotlin.kotlin.collections.Iterator;
+  var Iterable = Kotlin.kotlin.collections.Iterable;
   var toList = Kotlin.kotlin.collections.toList_7wnvza$;
   var toMutableList = Kotlin.kotlin.collections.toMutableList_4c7yge$;
   var IllegalStateException = Kotlin.kotlin.IllegalStateException;
@@ -16,8 +18,6 @@
   Partida$Scheduled.prototype.constructor = Partida$Scheduled;
   Partida$Empty.prototype = Object.create(Partida.prototype);
   Partida$Empty.prototype.constructor = Partida$Empty;
-  Equipe$TBD.prototype = Object.create(Equipe.prototype);
-  Equipe$TBD.prototype.constructor = Equipe$TBD;
   NodePos.prototype = Object.create(Enum.prototype);
   NodePos.prototype.constructor = NodePos;
   function main$lambda(it) {
@@ -62,6 +62,8 @@
     this.parent = parent;
   }
   function Tree$Node(index, value, left, right) {
+    if (index === void 0)
+      index = -1;
     Tree.call(this);
     this.index_z6w9bi$_0 = index;
     this.value_z6w9bi$_0 = value;
@@ -263,8 +265,9 @@
   function Partida$Empty() {
     Partida$Empty_instance = this;
     Partida.call(this);
-    this.equipe1_4i0bbi$_0 = Equipe$TBD_getInstance();
-    this.equipe2_4i0bbi$_0 = Equipe$TBD_getInstance();
+    this.TBD = new Equipe('TBD', 'TIME-TBD');
+    this.equipe1_4i0bbi$_0 = this.TBD;
+    this.equipe2_4i0bbi$_0 = this.TBD;
   }
   Object.defineProperty(Partida$Empty.prototype, 'equipe1', {
     get: function () {
@@ -276,6 +279,9 @@
       return this.equipe2_4i0bbi$_0;
     }
   });
+  Partida$Empty.prototype.toString = function () {
+    return 'Partida:Empty';
+  };
   Partida$Empty.$metadata$ = {
     kind: Kotlin.Kind.OBJECT,
     simpleName: 'Empty',
@@ -327,34 +333,55 @@
     this.nome = nome;
     this.codigo = codigo;
   }
-  function Equipe$TBD() {
-    Equipe$TBD_instance = this;
-    Equipe.call(this, 'B.Y.E', 'TIME-BYE');
-  }
-  Equipe$TBD.$metadata$ = {
-    kind: Kotlin.Kind.OBJECT,
-    simpleName: 'TBD',
-    interfaces: [Equipe]
-  };
-  var Equipe$TBD_instance = null;
-  function Equipe$TBD_getInstance() {
-    if (Equipe$TBD_instance === null) {
-      new Equipe$TBD();
-    }
-    return Equipe$TBD_instance;
-  }
   Equipe.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Equipe',
     interfaces: []
   };
+  Equipe.prototype.component1 = function () {
+    return this.nome;
+  };
+  Equipe.prototype.component2 = function () {
+    return this.codigo;
+  };
+  Equipe.prototype.copy_puj7f4$ = function (nome, codigo) {
+    return new Equipe(nome === void 0 ? this.nome : nome, codigo === void 0 ? this.codigo : codigo);
+  };
+  Equipe.prototype.toString = function () {
+    return 'Equipe(nome=' + Kotlin.toString(this.nome) + (', codigo=' + Kotlin.toString(this.codigo)) + ')';
+  };
+  Equipe.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.nome) | 0;
+    result = result * 31 + Kotlin.hashCode(this.codigo) | 0;
+    return result;
+  };
+  Equipe.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.nome, other.nome) && Kotlin.equals(this.codigo, other.codigo)))));
+  };
   function Bracket(root) {
     this.root = root;
   }
+  function Bracket$iterator$ObjectLiteral(this$Bracket) {
+    this.iterator = bfs(this$Bracket.root).iterator();
+  }
+  Bracket$iterator$ObjectLiteral.prototype.hasNext = function () {
+    return this.iterator.hasNext();
+  };
+  Bracket$iterator$ObjectLiteral.prototype.next = function () {
+    return this.iterator.next();
+  };
+  Bracket$iterator$ObjectLiteral.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    interfaces: [Iterator]
+  };
+  Bracket.prototype.iterator = function () {
+    return new Bracket$iterator$ObjectLiteral(this);
+  };
   Bracket.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Bracket',
-    interfaces: []
+    interfaces: [Iterable]
   };
   Bracket.prototype.component1 = function () {
     return this.root;
@@ -373,6 +400,28 @@
   Bracket.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && Kotlin.equals(this.root, other.root))));
   };
+  function bfs(root) {
+    var queue = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
+    var visited = Kotlin.kotlin.collections.LinkedHashSet_init_287e2$();
+    var list = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
+    queue.add_11rb$(root);
+    visited.add_11rb$(root);
+    while (!queue.isEmpty()) {
+      var current = queue.removeAt_za3lpa$(0);
+      list.add_11rb$(current);
+      if (Kotlin.isType(current, Tree$Node)) {
+        if (!visited.contains_11rb$(current.left)) {
+          queue.add_11rb$(current.left);
+          visited.add_11rb$(current.left);
+        }
+        if (!visited.contains_11rb$(current.right)) {
+          queue.add_11rb$(current.right);
+          visited.add_11rb$(current.right);
+        }
+      }
+    }
+    return toList(list);
+  }
   function createBracket(timesArray) {
     var tmp$;
     if (!(timesArray.length >= 2)) {
@@ -390,26 +439,28 @@
       tmp$ = new Tree$Leaf(0, new Partida$Scheduled(times.get_za3lpa$(0), times.get_za3lpa$(1)));
     else {
       var teamsList = toMutableList(times);
-      teamsList.iterator();
       while (teamsList.size % 4 !== 0)
         teamsList.add_11rb$(new Equipe('W.O', 'WO-' + Kotlin.toString(Math.random())));
       var levels = Math.log(teamsList.size / 2) / Math.log(2.0) | 0;
       tmp$ = buildTree(toList(teamsList).iterator(), 0, levels, NodePos$ROOT_getInstance());
     }
     var root = tmp$;
-    println(root);
     return new Bracket(root);
   }
   function addResultado(bracket, index, time1Pontos, time2Pontos) {
     var partidaNode = findMatch(bracket, index);
     if (partidaNode != null) {
-      var tmp$, tmp$_0, tmp$_1;
+      var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4;
+      if (!Kotlin.isType(partidaNode.value, Partida$Scheduled)) {
+        var message = 'Failed requirement.';
+        throw new Kotlin.kotlin.IllegalArgumentException(message.toString());
+      }
       var partida = Kotlin.isType(tmp$ = partidaNode.value, Partida$Scheduled) ? tmp$ : Kotlin.throwCCE();
       var finished = new Partida$Finished(partida.equipe1, partida.equipe2, new Resultado(time1Pontos, time2Pontos));
       if (Kotlin.isType(partidaNode, Tree$Node))
-        tmp$_0 = partidaNode.copy_2jx61p$(void 0, finished);
+        tmp$_0 = partidaNode.copy_2jx61p$(partidaNode.index, finished);
       else if (Kotlin.isType(partidaNode, Tree$Leaf))
-        tmp$_0 = partidaNode.copy_wxm5ur$(void 0, finished);
+        tmp$_0 = partidaNode.copy_wxm5ur$(partidaNode.index, finished);
       else
         tmp$_0 = Kotlin.noWhenBranchMatched();
       var newNode = tmp$_0;
@@ -422,13 +473,45 @@
           parent.right = newNode;
         else
           throw new IllegalStateException();
+        if (Kotlin.isType(parent.value, Partida$Empty)) {
+          var oldParent = parent;
+          if (Kotlin.isType(oldParent.left.value, Partida$Finished) && Kotlin.isType(oldParent.right.value, Partida$Finished)) {
+            var newPartida = new Partida$Scheduled((Kotlin.isType(tmp$_2 = oldParent.left.value, Partida$Finished) ? tmp$_2 : Kotlin.throwCCE()).winnner, (Kotlin.isType(tmp$_3 = oldParent.right.value, Partida$Finished) ? tmp$_3 : Kotlin.throwCCE()).winnner);
+            var newParent = oldParent.copy_2jx61p$(parent.index, newPartida);
+            newParent.parent = oldParent.parent;
+            if (newParent.parent != null) {
+              var topNode = Kotlin.isType(tmp$_4 = newParent.parent, Tree$Node) ? tmp$_4 : Kotlin.throwCCE();
+              if (topNode.left.index === newParent.index)
+                topNode.left = newParent;
+              else if (topNode.right.index === newParent.index)
+                topNode.right = newParent;
+              else
+                throw new IllegalStateException();
+            }
+             else {
+              bracket.root = newParent;
+            }
+          }
+        }
       }
        else {
         bracket.root = newNode;
       }
     }
-    println(bracket.root);
     return bracket;
+  }
+  function printTree$lambda(it) {
+    println('Index: ' + Kotlin.toString(it.index) + ' Partida: ' + Kotlin.toString(it.value));
+  }
+  function printTree(bracket) {
+    var action = printTree$lambda;
+    println('Normal');
+    var tmp$;
+    tmp$ = bracket.iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      action(element);
+    }
   }
   function findMatch(bracket, index) {
     return findMatch_0(bracket.root, index);
@@ -526,13 +609,12 @@
   });
   package$bracket.Partida = Partida;
   package$bracket.Resultado = Resultado;
-  Object.defineProperty(Equipe, 'TBD', {
-    get: Equipe$TBD_getInstance
-  });
   package$bracket.Equipe = Equipe;
   package$bracket.Bracket = Bracket;
+  package$bracket.bfs_k6352y$ = bfs;
   package$bracket.createBracket = createBracket;
   package$bracket.addResultado = addResultado;
+  package$bracket.printTree = printTree;
   package$bracket.findMatch = findMatch;
   Object.defineProperty(NodePos, 'LEFT', {
     get: NodePos$LEFT_getInstance

@@ -2,15 +2,11 @@ package bracket
 
 import kotlin.js.Math
 
-sealed class Tree<T>(var parent: Tree<T>? = null) : Iterable<T> {
+sealed class Tree<T>(var parent: Tree.Node<T>? = null) {
   abstract val value: T
   abstract var index: Int
 
-  override fun iterator(): Iterator<T> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  data class Node<T>(override var index: Int, override val value: T, var left: Tree<T>, var right: Tree<T>) : Tree<T>() {
+  data class Node<T>(override var index: Int = -1, override val value: T, var left: Tree<T>, var right: Tree<T>) : Tree<T>() {
     init {
       left.parent = this
       left.index = NodePos.LEFT.calc(index)
@@ -37,17 +33,59 @@ sealed class Partida {
 
   data class Scheduled(override val equipe1: Equipe, override val equipe2: Equipe) : Partida()
   object Empty : Partida() {
-    override val equipe1 = Equipe.TBD
-    override val equipe2 = Equipe.TBD
+    val TBD = Equipe("TBD","TIME-TBD")
+    override val equipe1 = TBD
+    override val equipe2 = TBD
+
+    override fun toString(): String {
+      return "Partida:Empty"
+    }
   }
 }
 
 data class Resultado(val time1Pontos: Int, val time2Pontos: Int)
-open class Equipe(val nome: String, val codigo: String) {
-  object TBD : Equipe("B.Y.E", "TIME-BYE")
+data class Equipe(val nome: String, val codigo: String)
+
+data class Bracket(var root: Tree<Partida>) : Iterable<Tree<Partida>> {
+  override fun iterator(): Iterator<Tree<Partida>> {
+    return object : Iterator<Tree<Partida>> {
+      val iterator = bfs(root).iterator()
+      override fun hasNext(): Boolean {
+        return iterator.hasNext()
+      }
+
+      override fun next(): Tree<Partida> {
+        return iterator.next()
+      }
+    }
+  }
 }
 
-data class Bracket(var root: Tree<Partida>)
+fun <T> bfs(root: Tree<T>): List<Tree<T>> {
+  val queue = mutableListOf<Tree<T>>()
+  val visited = mutableSetOf<Tree<T>>()
+  val list = mutableListOf<Tree<T>>()
+  queue.add(root)
+  visited.add(root)
+
+  while (!queue.isEmpty()) {
+    val current = queue.removeAt(0)
+    list.add(current)
+    when (current) {
+      is Tree.Node -> {
+        if (!visited.contains(current.left)) {
+          queue.add(current.left)
+          visited.add(current.left)
+        }
+        if (!visited.contains(current.right)) {
+          queue.add(current.right)
+          visited.add(current.right)
+        }
+      }
+    }
+  }
+  return list.toList()
+}
 
 @JsName("createBracket")
 fun createBracket(timesArray: Array<dynamic>): Bracket {
@@ -67,49 +105,16 @@ fun createBracket(timesArray: Array<dynamic>): Bracket {
 
 }
 
-//@JsName("assignIndex")
-//fun assignIndex(bracket: Bracket): Bracket {
-//  //BFS
-//  var index = 0
-//  val queue = mutableListOf<Tree<Partida>>()
-//  val visited = mutableSetOf<Tree<Partida>>()
-//  queue.add(bracket.root)
-//  visited.add(bracket.root)
-//
-//  while (!queue.isEmpty()) {
-//    val current = queue.removeAt(0)
-//    current.index = index
-//    println("Index: $index but parent is index: " + current.parent?.index)
-//    index += 1
-//    when (current) {
-//      is Tree.Node -> {
-//        if (!visited.contains(current.left)) {
-//          queue.add(current.left)
-//          visited.add(current.left)
-//        }
-//        if (!visited.contains(current.right)) {
-//          queue.add(current.right)
-//          visited.add(current.right)
-//        }
-//      }
-//    }
-//
-//  }
-//
-//  println(bracket.root)
-//  return bracket
-//}
-
-
 @JsName("addResultado")
 fun addResultado(bracket: Bracket, index: Int, time1Pontos: Int, time2Pontos: Int): Bracket {
   val partidaNode = findMatch(bracket, index)
   partidaNode?.let {
+    require(partidaNode.value is Partida.Scheduled)
     val partida = partidaNode.value as Partida.Scheduled
     val finished = Partida.Finished(partida.equipe1, partida.equipe2, Resultado(time1Pontos, time2Pontos))
     val newNode = when (partidaNode) {
-      is Tree.Node -> partidaNode.copy(value = finished)
-      is Tree.Leaf -> partidaNode.copy(value = finished)
+      is Tree.Node -> partidaNode.copy(index = partidaNode.index, value = finished)
+      is Tree.Leaf -> partidaNode.copy(index = partidaNode.index, value = finished)
     }
 
     newNode.parent = partidaNode.parent
@@ -121,15 +126,48 @@ fun addResultado(bracket: Bracket, index: Int, time1Pontos: Int, time2Pontos: In
         else -> throw IllegalStateException()
       }
 
+      if (parent.value is Partida.Empty) {
+          val oldParent = parent
+          if (oldParent.left.value is Partida.Finished && oldParent.right.value is Partida.Finished) {
+            val newPartida = Partida.Scheduled((oldParent.left.value as Partida.Finished).winnner,
+              (oldParent.right.value as Partida.Finished).winnner)
+
+            val newParent = oldParent.copy(index = parent.index, value = newPartida)
+            newParent.parent = oldParent.parent
+
+            if (newParent.parent != null) {
+              val topNode = newParent.parent as Tree.Node
+              with(topNode) {
+                when {
+                  left.index == newParent.index -> left = newParent
+                  right.index == newParent.index -> right = newParent
+                  else -> throw IllegalStateException()
+                }
+              }
+            } else {
+              bracket.root = newParent
+            }
+
+          }
+
+      }
+
     } else {
       bracket.root = newNode
     }
 
   }
 
-  println(bracket.root)
   return bracket
 }
+
+@JsName("printTree")
+fun printTree(bracket: Bracket) {
+  val action: (Tree<Partida>) -> Unit = { println("Index: " + it.index + " Partida: " + it.value) }
+  println("Normal")
+  bracket.forEach(action)
+}
+
 
 @JsName("findMatch")
 fun findMatch(bracket: Bracket, index: Int): Tree<Partida>? = findMatch(bracket.root, index)
