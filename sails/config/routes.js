@@ -55,22 +55,14 @@ module.exports.routes = {
           }
           var bracket = tourney.createBracket(times);
           tourney.printTree(bracket);
-//          bracket = tourney.addResultado(bracket, 6, 16, 5);
-//          tourney.printTree(bracket);
-//          bracket = tourney.addResultado(bracket, 5, 1, 16);
-//          tourney.printTree(bracket);
-//          bracket = tourney.addResultado(bracket, 4, 16, 10);
-//          tourney.printTree(bracket);
-//          bracket = tourney.addResultado(bracket, 3, 10, 16);
-//          tourney.printTree(bracket);
+          bracket = tourney.addResultado(bracket, 6, 16, 5);
+          bracket = tourney.addResultado(bracket, 5, 1, 16);
+          bracket = tourney.addResultado(bracket, 4, 16, 10);
+          bracket = tourney.addResultado(bracket, 3, 10, 16);
           bracket = tourney.addResultado(bracket, 2, 16, 7);
-//          tourney.printTree(bracket);
           bracket = tourney.addResultado(bracket, 1, 3, 16);
-//          tourney.printTree(bracket);
-          bracket = tourney.addResultado(bracket, 0, 1, 16);
+          bracket = tourney.addResultado(bracket, 0, 16, 2);
           tourney.printTree(bracket);
-
-
           return res.view('entidade', {data : times});
       });
   },

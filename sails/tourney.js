@@ -56,24 +56,21 @@
     }
     sails.lift(rc('sails'));
   }
-  function Tree(parent) {
-    if (parent === void 0)
-      parent = null;
-    this.parent = parent;
+  function Tree() {
   }
-  function Tree$Node(index, value, left, right) {
-    if (index === void 0)
-      index = -1;
+  function Tree$Node(parent, index, value) {
     Tree.call(this);
+    this.parent_z6w9bi$_0 = parent;
     this.index_z6w9bi$_0 = index;
     this.value_z6w9bi$_0 = value;
-    this.left = left;
-    this.right = right;
-    this.left.parent = this;
-    this.left.index = NodePos$LEFT_getInstance().calc(this.index);
-    this.right.parent = this;
-    this.right.index = NodePos$RIGHT_getInstance().calc(this.index);
+    this.left = this.left;
+    this.right = this.right;
   }
+  Object.defineProperty(Tree$Node.prototype, 'parent', {
+    get: function () {
+      return this.parent_z6w9bi$_0;
+    }
+  });
   Object.defineProperty(Tree$Node.prototype, 'index', {
     get: function () {
       return this.index_z6w9bi$_0;
@@ -93,41 +90,41 @@
     interfaces: [Tree]
   };
   Tree$Node.prototype.component1 = function () {
-    return this.index;
+    return this.parent;
   };
   Tree$Node.prototype.component2 = function () {
-    return this.value;
+    return this.index;
   };
   Tree$Node.prototype.component3 = function () {
-    return this.left;
+    return this.value;
   };
-  Tree$Node.prototype.component4 = function () {
-    return this.right;
-  };
-  Tree$Node.prototype.copy_2jx61p$ = function (index, value, left, right) {
-    return new Tree$Node(index === void 0 ? this.index : index, value === void 0 ? this.value : value, left === void 0 ? this.left : left, right === void 0 ? this.right : right);
+  Tree$Node.prototype.copy_uvwis1$ = function (parent, index, value) {
+    return new Tree$Node(parent === void 0 ? this.parent : parent, index === void 0 ? this.index : index, value === void 0 ? this.value : value);
   };
   Tree$Node.prototype.toString = function () {
-    return 'Node(index=' + Kotlin.toString(this.index) + (', value=' + Kotlin.toString(this.value)) + (', left=' + Kotlin.toString(this.left)) + (', right=' + Kotlin.toString(this.right)) + ')';
+    return 'Node(parent=' + Kotlin.toString(this.parent) + (', index=' + Kotlin.toString(this.index)) + (', value=' + Kotlin.toString(this.value)) + ')';
   };
   Tree$Node.prototype.hashCode = function () {
     var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.parent) | 0;
     result = result * 31 + Kotlin.hashCode(this.index) | 0;
     result = result * 31 + Kotlin.hashCode(this.value) | 0;
-    result = result * 31 + Kotlin.hashCode(this.left) | 0;
-    result = result * 31 + Kotlin.hashCode(this.right) | 0;
     return result;
   };
   Tree$Node.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.index, other.index) && Kotlin.equals(this.value, other.value) && Kotlin.equals(this.left, other.left) && Kotlin.equals(this.right, other.right)))));
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.parent, other.parent) && Kotlin.equals(this.index, other.index) && Kotlin.equals(this.value, other.value)))));
   };
-  function Tree$Leaf(index, value) {
-    if (index === void 0)
-      index = -1;
+  function Tree$Leaf(parent, index, value) {
     Tree.call(this);
+    this.parent_z5m82a$_0 = parent;
     this.index_z5m82a$_0 = index;
     this.value_z5m82a$_0 = value;
   }
+  Object.defineProperty(Tree$Leaf.prototype, 'parent', {
+    get: function () {
+      return this.parent_z5m82a$_0;
+    }
+  });
   Object.defineProperty(Tree$Leaf.prototype, 'index', {
     get: function () {
       return this.index_z5m82a$_0;
@@ -147,25 +144,29 @@
     interfaces: [Tree]
   };
   Tree$Leaf.prototype.component1 = function () {
-    return this.index;
+    return this.parent;
   };
   Tree$Leaf.prototype.component2 = function () {
+    return this.index;
+  };
+  Tree$Leaf.prototype.component3 = function () {
     return this.value;
   };
-  Tree$Leaf.prototype.copy_wxm5ur$ = function (index, value) {
-    return new Tree$Leaf(index === void 0 ? this.index : index, value === void 0 ? this.value : value);
+  Tree$Leaf.prototype.copy_uvwis1$ = function (parent, index, value) {
+    return new Tree$Leaf(parent === void 0 ? this.parent : parent, index === void 0 ? this.index : index, value === void 0 ? this.value : value);
   };
   Tree$Leaf.prototype.toString = function () {
-    return 'Leaf(index=' + Kotlin.toString(this.index) + (', value=' + Kotlin.toString(this.value)) + ')';
+    return 'Leaf(parent=' + Kotlin.toString(this.parent) + (', index=' + Kotlin.toString(this.index)) + (', value=' + Kotlin.toString(this.value)) + ')';
   };
   Tree$Leaf.prototype.hashCode = function () {
     var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.parent) | 0;
     result = result * 31 + Kotlin.hashCode(this.index) | 0;
     result = result * 31 + Kotlin.hashCode(this.value) | 0;
     return result;
   };
   Tree$Leaf.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.index, other.index) && Kotlin.equals(this.value, other.value)))));
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.parent, other.parent) && Kotlin.equals(this.index, other.index) && Kotlin.equals(this.value, other.value)))));
   };
   Tree.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -436,13 +437,14 @@
     }
     var times = toList(destination);
     if (times.size === 2)
-      tmp$ = new Tree$Leaf(0, new Partida$Scheduled(times.get_za3lpa$(0), times.get_za3lpa$(1)));
+      tmp$ = new Tree$Leaf(null, 0, new Partida$Scheduled(times.get_za3lpa$(0), times.get_za3lpa$(1)));
     else {
       var teamsList = toMutableList(times);
       while (teamsList.size % 4 !== 0)
         teamsList.add_11rb$(new Equipe('W.O', 'WO-' + Kotlin.toString(Math.random())));
       var levels = Math.log(teamsList.size / 2) / Math.log(2.0) | 0;
-      tmp$ = buildTree(toList(teamsList).iterator(), 0, levels, NodePos$ROOT_getInstance());
+      var stack = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
+      tmp$ = buildTree(toList(teamsList).iterator(), 0, levels, NodePos$ROOT_getInstance(), stack);
     }
     var root = tmp$;
     return new Bracket(root);
@@ -450,21 +452,24 @@
   function addResultado(bracket, index, time1Pontos, time2Pontos) {
     var partidaNode = findMatch(bracket, index);
     if (partidaNode != null) {
-      var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4;
+      var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3;
       if (!Kotlin.isType(partidaNode.value, Partida$Scheduled)) {
         var message = 'Failed requirement.';
         throw new Kotlin.kotlin.IllegalArgumentException(message.toString());
       }
       var partida = Kotlin.isType(tmp$ = partidaNode.value, Partida$Scheduled) ? tmp$ : Kotlin.throwCCE();
       var finished = new Partida$Finished(partida.equipe1, partida.equipe2, new Resultado(time1Pontos, time2Pontos));
-      if (Kotlin.isType(partidaNode, Tree$Node))
-        tmp$_0 = partidaNode.copy_2jx61p$(partidaNode.index, finished);
-      else if (Kotlin.isType(partidaNode, Tree$Leaf))
-        tmp$_0 = partidaNode.copy_wxm5ur$(partidaNode.index, finished);
+      if (Kotlin.isType(partidaNode, Tree$Node)) {
+        var $receiver = partidaNode.copy_uvwis1$(void 0, void 0, finished);
+        $receiver.left = partidaNode.left;
+        $receiver.right = partidaNode.right;
+        tmp$_0 = $receiver;
+      }
+       else if (Kotlin.isType(partidaNode, Tree$Leaf))
+        tmp$_0 = partidaNode.copy_uvwis1$(void 0, void 0, finished);
       else
         tmp$_0 = Kotlin.noWhenBranchMatched();
       var newNode = tmp$_0;
-      newNode.parent = partidaNode.parent;
       if (newNode.parent != null) {
         var parent = Kotlin.isType(tmp$_1 = newNode.parent, Tree$Node) ? tmp$_1 : Kotlin.throwCCE();
         if (parent.left.index === newNode.index)
@@ -477,10 +482,12 @@
           var oldParent = parent;
           if (Kotlin.isType(oldParent.left.value, Partida$Finished) && Kotlin.isType(oldParent.right.value, Partida$Finished)) {
             var newPartida = new Partida$Scheduled((Kotlin.isType(tmp$_2 = oldParent.left.value, Partida$Finished) ? tmp$_2 : Kotlin.throwCCE()).winnner, (Kotlin.isType(tmp$_3 = oldParent.right.value, Partida$Finished) ? tmp$_3 : Kotlin.throwCCE()).winnner);
-            var newParent = oldParent.copy_2jx61p$(parent.index, newPartida);
-            newParent.parent = oldParent.parent;
+            var $receiver_0 = oldParent.copy_uvwis1$(void 0, void 0, newPartida);
+            $receiver_0.left = oldParent.left;
+            $receiver_0.right = oldParent.right;
+            var newParent = $receiver_0;
             if (newParent.parent != null) {
-              var topNode = Kotlin.isType(tmp$_4 = newParent.parent, Tree$Node) ? tmp$_4 : Kotlin.throwCCE();
+              var topNode = newParent.parent;
               if (topNode.left.index === newParent.index)
                 topNode.left = newParent;
               else if (topNode.right.index === newParent.index)
@@ -505,7 +512,6 @@
   }
   function printTree(bracket) {
     var action = printTree$lambda;
-    println('Normal');
     var tmp$;
     tmp$ = bracket.iterator();
     while (tmp$.hasNext()) {
@@ -587,15 +593,23 @@
     }
   }
   NodePos.valueOf_61zpoe$ = NodePos$valueOf;
-  function buildTree(iterator, index, maxTreeHeight, pos) {
-    var tmp$;
+  function buildTree(iterator, index, maxTreeHeight, pos, stack) {
+    var tmp$, tmp$_0;
     if (index > maxTreeHeight)
       throw new IllegalStateException();
-    else if (index === maxTreeHeight)
-      tmp$ = new Tree$Leaf(void 0, new Partida$Scheduled(iterator.next(), iterator.next()));
-    else
-      return new Tree$Node(pos.calc(index - 1 | 0), Partida$Empty_getInstance(), buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$LEFT_getInstance()), buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$RIGHT_getInstance()));
-    return tmp$;
+    else if (index === maxTreeHeight) {
+      var parentNode = stack.isEmpty() ? null : stack.get_za3lpa$(0);
+      return new Tree$Leaf(parentNode, pos.calc((tmp$ = parentNode != null ? parentNode.index : null) != null ? tmp$ : 0), new Partida$Scheduled(iterator.next(), iterator.next()));
+    }
+     else {
+      var parentNode_0 = stack.isEmpty() ? null : stack.get_za3lpa$(0);
+      var node = new Tree$Node(parentNode_0, pos.calc((tmp$_0 = parentNode_0 != null ? parentNode_0.index : null) != null ? tmp$_0 : 0), Partida$Empty_getInstance());
+      stack.add_wxm5ur$(0, node);
+      node.left = buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$LEFT_getInstance(), stack);
+      node.right = buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$RIGHT_getInstance(), stack);
+      stack.removeAt_za3lpa$(0);
+      return node;
+    }
   }
   _.main_kand9s$ = main;
   Tree.Node = Tree$Node;

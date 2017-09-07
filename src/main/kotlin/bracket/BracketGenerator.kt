@@ -2,21 +2,25 @@ package bracket
 
 import kotlin.js.Math
 
-sealed class Tree<T>(var parent: Tree.Node<T>? = null) {
+sealed class Tree<T> {
   abstract val value: T
   abstract var index: Int
+  abstract val parent: Tree.Node<T>?
 
-  data class Node<T>(override var index: Int = -1, override val value: T, var left: Tree<T>, var right: Tree<T>) : Tree<T>() {
+  data class Node<T>(override val parent: Node<T>?, override var index: Int, override val value: T) : Tree<T>() {
+    lateinit var left: Tree<T> //Hope to improve this someday
+    lateinit var right: Tree<T> //Hope to improve this someday
     init {
-      left.parent = this
-      left.index = NodePos.LEFT.calc(index)
-      right.parent = this
-      right.index = NodePos.RIGHT.calc(index)
+//      println("Node: $index , leftChild: " + left.index + " rightChild: " + right.index)
     }
   }
 
-  //Parent Node will calculate each children's index
-  data class Leaf<T>(override var index: Int = -1, override val value: T) : Tree<T>()
+  data class Leaf<T>(override val parent: Node<T>?, override var index: Int, override val value: T) : Tree<T>() {
+    init {
+//      println("Leaf: $index")
+    }
+  }
+
 }
 
 sealed class Partida {
@@ -33,7 +37,7 @@ sealed class Partida {
 
   data class Scheduled(override val equipe1: Equipe, override val equipe2: Equipe) : Partida()
   object Empty : Partida() {
-    val TBD = Equipe("TBD","TIME-TBD")
+    val TBD = Equipe("TBD", "TIME-TBD")
     override val equipe1 = TBD
     override val equipe2 = TBD
 
@@ -92,12 +96,13 @@ fun createBracket(timesArray: Array<dynamic>): Bracket {
   require(timesArray.size >= 2)
   val times = timesArray.map { Equipe(it.nome, it.codigo) }.toList()
   val root: Tree<Partida> = when {
-    times.size == 2 -> Tree.Leaf(0, Partida.Scheduled(times[0], times[1]))
+    times.size == 2 -> Tree.Leaf(parent = null, index =  0, value = Partida.Scheduled(times[0], times[1]))
     else -> {
       val teamsList = times.toMutableList()
       while (teamsList.size % 4 != 0) teamsList.add(Equipe("W.O", "WO-" + Math.random()))
       val levels = (Math.log(teamsList.size.toDouble() / 2) / Math.log(2.0)).toInt() //I.E. if 8 teams, 4 games,  log2 4 = 2.
-      buildTree(teamsList.toList().iterator(), 0, levels, NodePos.ROOT)
+      val stack = mutableListOf<Tree.Node<Partida>>()
+      buildTree(teamsList.toList().iterator(), 0, levels, NodePos.ROOT, stack)
     }
   }
 
@@ -113,11 +118,15 @@ fun addResultado(bracket: Bracket, index: Int, time1Pontos: Int, time2Pontos: In
     val partida = partidaNode.value as Partida.Scheduled
     val finished = Partida.Finished(partida.equipe1, partida.equipe2, Resultado(time1Pontos, time2Pontos))
     val newNode = when (partidaNode) {
-      is Tree.Node -> partidaNode.copy(index = partidaNode.index, value = finished)
-      is Tree.Leaf -> partidaNode.copy(index = partidaNode.index, value = finished)
+      is Tree.Node ->  {
+        partidaNode.copy(value = finished).apply {
+          left = partidaNode.left
+          right = partidaNode.right
+        }
+      }
+      is Tree.Leaf -> partidaNode.copy(value = finished)
     }
 
-    newNode.parent = partidaNode.parent
     if (newNode.parent != null) {
       val parent = newNode.parent as Tree.Node
       when {
@@ -127,28 +136,30 @@ fun addResultado(bracket: Bracket, index: Int, time1Pontos: Int, time2Pontos: In
       }
 
       if (parent.value is Partida.Empty) {
-          val oldParent = parent
-          if (oldParent.left.value is Partida.Finished && oldParent.right.value is Partida.Finished) {
-            val newPartida = Partida.Scheduled((oldParent.left.value as Partida.Finished).winnner,
-              (oldParent.right.value as Partida.Finished).winnner)
+        val oldParent = parent
+        if (oldParent.left.value is Partida.Finished && oldParent.right.value is Partida.Finished) {
+          val newPartida = Partida.Scheduled((oldParent.left.value as Partida.Finished).winnner,
+            (oldParent.right.value as Partida.Finished).winnner)
 
-            val newParent = oldParent.copy(index = parent.index, value = newPartida)
-            newParent.parent = oldParent.parent
-
-            if (newParent.parent != null) {
-              val topNode = newParent.parent as Tree.Node
-              with(topNode) {
-                when {
-                  left.index == newParent.index -> left = newParent
-                  right.index == newParent.index -> right = newParent
-                  else -> throw IllegalStateException()
-                }
-              }
-            } else {
-              bracket.root = newParent
-            }
-
+          val newParent = oldParent.copy(value = newPartida).apply {
+            left = oldParent.left
+            right = oldParent.right
           }
+
+          if (newParent.parent != null) {
+            val topNode = newParent.parent
+            with(topNode) {
+              when {
+                left.index == newParent.index -> left = newParent
+                right.index == newParent.index -> right = newParent
+                else -> throw IllegalStateException()
+              }
+            }
+          } else {
+            bracket.root = newParent
+          }
+
+        }
 
       }
 
@@ -164,7 +175,6 @@ fun addResultado(bracket: Bracket, index: Int, time1Pontos: Int, time2Pontos: In
 @JsName("printTree")
 fun printTree(bracket: Bracket) {
   val action: (Tree<Partida>) -> Unit = { println("Index: " + it.index + " Partida: " + it.value) }
-  println("Normal")
   bracket.forEach(action)
 }
 
@@ -174,33 +184,43 @@ fun findMatch(bracket: Bracket, index: Int): Tree<Partida>? = findMatch(bracket.
 
 private fun findMatch(node: Tree<Partida>, index: Int): Tree<Partida>?
   = with(node) {
-    if (this.index == index) return this
-    return when (this) {
-      is Tree.Node -> {
-        val left = findMatch(left, index)
-        val right = findMatch(right, index)
-        left ?: right
-      }
-      else -> null
+  if (this.index == index) return this
+  return when (this) {
+    is Tree.Node -> {
+      val left = findMatch(left, index)
+      val right = findMatch(right, index)
+      left ?: right
     }
+    else -> null
+  }
 }
 
 enum class NodePos(val calc: (index: Int) -> Int) {
   //Store BT in array, children of node at index
-  LEFT({(2 * it) + 1}),  //2i + 1 (left)
-  RIGHT({(2 * it) + 2}),  //2i + 2 (right)
+  LEFT({ (2 * it) + 1 }), //2i + 1 (left)
+  RIGHT({ (2 * it) + 2 }), //2i + 2 (right)
   ROOT({ 0 })
 }
 
-private fun buildTree(iterator: Iterator<Equipe>, index: Int, maxTreeHeight: Int, pos: NodePos): Tree<Partida> {
+private fun buildTree(iterator: Iterator<Equipe>, index: Int, maxTreeHeight: Int, pos: NodePos,
+                      stack: MutableList<Tree.Node<Partida>>): Tree<Partida> {
   //each height of the three = number of games is 2 ^ index
   //i.e Finals(index = 0) has 1 game (2^0), Semifinals (index: 1 ) has 2 games (2^1).
-//  println("Index: $index Level: $maxTreeHeight")
-  return when {
+///  println("Index: $index Level: $maxTreeHeight")
+  when {
     index > maxTreeHeight -> throw IllegalStateException()
-    index == maxTreeHeight -> Tree.Leaf(value = Partida.Scheduled(iterator.next(), iterator.next()))
-    else -> return Tree.Node(pos.calc(index - 1), Partida.Empty,
-      buildTree(iterator, index + 1, maxTreeHeight, NodePos.LEFT),
-      buildTree(iterator, index + 1, maxTreeHeight, NodePos.RIGHT))
+    index == maxTreeHeight -> {
+      val parentNode = if (stack.isEmpty()) null else stack[0] //Edge case for Root Node
+      return Tree.Leaf(parent = parentNode, index = pos.calc(parentNode?.index ?: 0), value = Partida.Scheduled(iterator.next(), iterator.next()))
+    }
+    else -> {
+      val parentNode = if (stack.isEmpty()) null else stack[0] //Edge case for Root Node
+      val node = Tree.Node(parent = parentNode, index = pos.calc(parentNode?.index ?: 0), value = Partida.Empty)
+      stack.add(0, node)
+      node.left = buildTree(iterator, index + 1, maxTreeHeight, NodePos.LEFT, stack)
+      node.right = buildTree(iterator, index + 1, maxTreeHeight, NodePos.RIGHT, stack)
+      stack.removeAt(0)
+      return node
+    }
   }
 }
