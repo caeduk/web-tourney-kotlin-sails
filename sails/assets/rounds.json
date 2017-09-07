@@ -1,0 +1,155 @@
+[
+  [
+    {
+      "equipe1": {
+        "nome": "WO",
+        "codigo": "WO-0.8750049940779197",
+        "ID": "494464349"
+      },
+      "equipe2": {
+        "nome": "WO",
+        "codigo": "WO-0.5257907383953004",
+        "ID": "752991043"
+      },
+      "resultado": {
+        "time1Pontos": 16,
+        "time2Pontos": 5
+      },
+      "winnner": {
+        "nome": "WO",
+        "codigo": "WO-0.8750049940779197",
+        "ID": "494464349"
+      }
+    },
+    {
+      "equipe1": {
+        "nome": "Azeitona",
+        "codigo": "TIME-080",
+        "ID": "1294971864"
+      },
+      "equipe2": {
+        "nome": "WO",
+        "codigo": "WO-0.7385549908981424",
+        "ID": "424254135"
+      },
+      "resultado": {
+        "time1Pontos": 1,
+        "time2Pontos": 16
+      },
+      "winnner": {
+        "nome": "WO",
+        "codigo": "WO-0.7385549908981424",
+        "ID": "424254135"
+      }
+    },
+    {
+      "equipe1": {
+        "nome": "Naschownz",
+        "codigo": "TIME-041",
+        "ID": "1294971987"
+      },
+      "equipe2": {
+        "nome": "Reco-Reco",
+        "codigo": "TIME-050",
+        "ID": "1294971957"
+      },
+      "resultado": {
+        "time1Pontos": 16,
+        "time2Pontos": 10
+      },
+      "winnner": {
+        "nome": "Naschownz",
+        "codigo": "TIME-041",
+        "ID": "1294971987"
+      }
+    },
+    {
+      "equipe1": {
+        "nome": "uNexpected-sim",
+        "codigo": "TIME-012",
+        "ID": "1294972079"
+      },
+      "equipe2": {
+        "nome": "CaeCuzão",
+        "codigo": "TIME-035",
+        "ID": "1294972014"
+      },
+      "resultado": {
+        "time1Pontos": 10,
+        "time2Pontos": 16
+      },
+      "winnner": {
+        "nome": "CaeCuzão",
+        "codigo": "TIME-035",
+        "ID": "1294972014"
+      }
+    }
+  ],
+  [
+    {
+      "equipe1": {
+        "nome": "WO",
+        "codigo": "WO-0.7385549908981424",
+        "ID": "424254135"
+      },
+      "equipe2": {
+        "nome": "WO",
+        "codigo": "WO-0.8750049940779197",
+        "ID": "494464349"
+      },
+      "resultado": {
+        "time1Pontos": 16,
+        "time2Pontos": 7
+      },
+      "winnner": {
+        "nome": "WO",
+        "codigo": "WO-0.7385549908981424",
+        "ID": "424254135"
+      }
+    },
+    {
+      "equipe1": {
+        "nome": "CaeCuzão",
+        "codigo": "TIME-035",
+        "ID": "1294972014"
+      },
+      "equipe2": {
+        "nome": "Naschownz",
+        "codigo": "TIME-041",
+        "ID": "1294971987"
+      },
+      "resultado": {
+        "time1Pontos": 3,
+        "time2Pontos": 16
+      },
+      "winnner": {
+        "nome": "Naschownz",
+        "codigo": "TIME-041",
+        "ID": "1294971987"
+      }
+    }
+  ],
+  [
+    {
+      "equipe1": {
+        "nome": "Naschownz",
+        "codigo": "TIME-041",
+        "ID": "1294971987"
+      },
+      "equipe2": {
+        "nome": "WO",
+        "codigo": "WO-0.7385549908981424",
+        "ID": "424254135"
+      },
+      "resultado": {
+        "time1Pontos": 16,
+        "time2Pontos": 2
+      },
+      "winnner": {
+        "nome": "Naschownz",
+        "codigo": "TIME-041",
+        "ID": "1294971987"
+      }
+    }
+  ]
+]

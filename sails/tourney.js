@@ -3,6 +3,8 @@
   var println = Kotlin.kotlin.io.println_s8jyv4$;
   var Exception = Kotlin.kotlin.Exception;
   var Iterator = Kotlin.kotlin.collections.Iterator;
+  var reversed = Kotlin.kotlin.collections.reversed_7wnvza$;
+  var until = Kotlin.kotlin.ranges.until_dqglrj$;
   var Iterable = Kotlin.kotlin.collections.Iterable;
   var toList = Kotlin.kotlin.collections.toList_7wnvza$;
   var toMutableList = Kotlin.kotlin.collections.toMutableList_4c7yge$;
@@ -12,6 +14,8 @@
   Tree$Node.prototype.constructor = Tree$Node;
   Tree$Leaf.prototype = Object.create(Tree.prototype);
   Tree$Leaf.prototype.constructor = Tree$Leaf;
+  Partida$Winner.prototype = Object.create(Partida.prototype);
+  Partida$Winner.prototype.constructor = Partida$Winner;
   Partida$Finished.prototype = Object.create(Partida.prototype);
   Partida$Finished.prototype.constructor = Partida$Finished;
   Partida$Scheduled.prototype = Object.create(Partida.prototype);
@@ -74,9 +78,6 @@
   Object.defineProperty(Tree$Node.prototype, 'index', {
     get: function () {
       return this.index_z6w9bi$_0;
-    },
-    set: function (index) {
-      this.index_z6w9bi$_0 = index;
     }
   });
   Object.defineProperty(Tree$Node.prototype, 'value', {
@@ -84,6 +85,13 @@
       return this.value_z6w9bi$_0;
     }
   });
+  Tree$Node.prototype.fullCopy_11rb$ = function (newValue) {
+    var oldRef = this;
+    var $receiver = this.copy_uvwis1$(void 0, void 0, newValue);
+    $receiver.left = oldRef.left;
+    $receiver.right = oldRef.right;
+    return $receiver;
+  };
   Tree$Node.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Node',
@@ -128,9 +136,6 @@
   Object.defineProperty(Tree$Leaf.prototype, 'index', {
     get: function () {
       return this.index_z5m82a$_0;
-    },
-    set: function (index) {
-      this.index_z5m82a$_0 = index;
     }
   });
   Object.defineProperty(Tree$Leaf.prototype, 'value', {
@@ -175,23 +180,39 @@
   };
   function Partida() {
   }
+  function Partida$Winner(equipe1) {
+    Partida.call(this);
+    this.equipe1 = equipe1;
+  }
+  Partida$Winner.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Winner',
+    interfaces: [Partida]
+  };
+  Partida$Winner.prototype.component1 = function () {
+    return this.equipe1;
+  };
+  Partida$Winner.prototype.copy_buq5r9$ = function (equipe1) {
+    return new Partida$Winner(equipe1 === void 0 ? this.equipe1 : equipe1);
+  };
+  Partida$Winner.prototype.toString = function () {
+    return 'Winner(equipe1=' + Kotlin.toString(this.equipe1) + ')';
+  };
+  Partida$Winner.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.equipe1) | 0;
+    return result;
+  };
+  Partida$Winner.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && Kotlin.equals(this.equipe1, other.equipe1))));
+  };
   function Partida$Finished(equipe1, equipe2, resultado) {
     Partida.call(this);
-    this.equipe1_6cfujd$_0 = equipe1;
-    this.equipe2_6cfujd$_0 = equipe2;
+    this.equipe1 = equipe1;
+    this.equipe2 = equipe2;
     this.resultado = resultado;
     this.winnner = this.resultado.time1Pontos > this.resultado.time2Pontos ? this.equipe1 : this.equipe2;
   }
-  Object.defineProperty(Partida$Finished.prototype, 'equipe1', {
-    get: function () {
-      return this.equipe1_6cfujd$_0;
-    }
-  });
-  Object.defineProperty(Partida$Finished.prototype, 'equipe2', {
-    get: function () {
-      return this.equipe2_6cfujd$_0;
-    }
-  });
   Partida$Finished.prototype.toString = function () {
     return 'Finished(equipe1=' + this.equipe1 + ', equipe2=' + this.equipe2 + ', resultado=' + this.resultado + ', winnner=' + this.winnner + ')';
   };
@@ -224,19 +245,9 @@
   };
   function Partida$Scheduled(equipe1, equipe2) {
     Partida.call(this);
-    this.equipe1_e18z2q$_0 = equipe1;
-    this.equipe2_e18z2q$_0 = equipe2;
+    this.equipe1 = equipe1;
+    this.equipe2 = equipe2;
   }
-  Object.defineProperty(Partida$Scheduled.prototype, 'equipe1', {
-    get: function () {
-      return this.equipe1_e18z2q$_0;
-    }
-  });
-  Object.defineProperty(Partida$Scheduled.prototype, 'equipe2', {
-    get: function () {
-      return this.equipe2_e18z2q$_0;
-    }
-  });
   Partida$Scheduled.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Scheduled',
@@ -266,23 +277,9 @@
   function Partida$Empty() {
     Partida$Empty_instance = this;
     Partida.call(this);
-    this.TBD = new Equipe('TBD', 'TIME-TBD');
-    this.equipe1_4i0bbi$_0 = this.TBD;
-    this.equipe2_4i0bbi$_0 = this.TBD;
+    this.equipe1 = EQUIPE_TBD;
+    this.equipe2 = EQUIPE_TBD;
   }
-  Object.defineProperty(Partida$Empty.prototype, 'equipe1', {
-    get: function () {
-      return this.equipe1_4i0bbi$_0;
-    }
-  });
-  Object.defineProperty(Partida$Empty.prototype, 'equipe2', {
-    get: function () {
-      return this.equipe2_4i0bbi$_0;
-    }
-  });
-  Partida$Empty.prototype.toString = function () {
-    return 'Partida:Empty';
-  };
   Partida$Empty.$metadata$ = {
     kind: Kotlin.Kind.OBJECT,
     simpleName: 'Empty',
@@ -300,6 +297,7 @@
     simpleName: 'Partida',
     interfaces: []
   };
+  var EQUIPE_TBD;
   function Resultado(time1Pontos, time2Pontos) {
     this.time1Pontos = time1Pontos;
     this.time2Pontos = time2Pontos;
@@ -330,35 +328,45 @@
   Resultado.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.time1Pontos, other.time1Pontos) && Kotlin.equals(this.time2Pontos, other.time2Pontos)))));
   };
-  function Equipe(nome, codigo) {
+  function Equipe(nome, codigo, ID) {
     this.nome = nome;
     this.codigo = codigo;
+    this.ID = ID;
   }
   Equipe.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Equipe',
     interfaces: []
   };
+  function Equipe_init(nome, codigo, $this) {
+    $this = $this || Object.create(Equipe.prototype);
+    Equipe.call($this, nome, codigo, Math.abs(Kotlin.hashCode(codigo)).toString());
+    return $this;
+  }
   Equipe.prototype.component1 = function () {
     return this.nome;
   };
   Equipe.prototype.component2 = function () {
     return this.codigo;
   };
-  Equipe.prototype.copy_puj7f4$ = function (nome, codigo) {
-    return new Equipe(nome === void 0 ? this.nome : nome, codigo === void 0 ? this.codigo : codigo);
+  Equipe.prototype.component3 = function () {
+    return this.ID;
+  };
+  Equipe.prototype.copy_6hosri$ = function (nome, codigo, ID) {
+    return new Equipe(nome === void 0 ? this.nome : nome, codigo === void 0 ? this.codigo : codigo, ID === void 0 ? this.ID : ID);
   };
   Equipe.prototype.toString = function () {
-    return 'Equipe(nome=' + Kotlin.toString(this.nome) + (', codigo=' + Kotlin.toString(this.codigo)) + ')';
+    return 'Equipe(nome=' + Kotlin.toString(this.nome) + (', codigo=' + Kotlin.toString(this.codigo)) + (', ID=' + Kotlin.toString(this.ID)) + ')';
   };
   Equipe.prototype.hashCode = function () {
     var result = 0;
     result = result * 31 + Kotlin.hashCode(this.nome) | 0;
     result = result * 31 + Kotlin.hashCode(this.codigo) | 0;
+    result = result * 31 + Kotlin.hashCode(this.ID) | 0;
     return result;
   };
   Equipe.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.nome, other.nome) && Kotlin.equals(this.codigo, other.codigo)))));
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.nome, other.nome) && Kotlin.equals(this.codigo, other.codigo) && Kotlin.equals(this.ID, other.ID)))));
   };
   function Bracket(root) {
     this.root = root;
@@ -378,6 +386,39 @@
   };
   Bracket.prototype.iterator = function () {
     return new Bracket$iterator$ObjectLiteral(this);
+  };
+  Bracket.prototype.prettyPrint = function () {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
+    var finalList = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
+    var list = reversed(bfs(this.root));
+    var numberOfTeams = list.size + 1 | 0;
+    var iterator = list.iterator();
+    var rounds = Math.log(numberOfTeams) / Math.log(2.0) | 0;
+    var numberOfMatches = numberOfTeams / 2 | 0;
+    tmp$ = until(0, rounds);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var counter = tmp$_0; counter <= tmp$_1; counter += tmp$_2) {
+      var tempList = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
+      tmp$_3 = until(0, numberOfMatches);
+      tmp$_4 = tmp$_3.first;
+      tmp$_5 = tmp$_3.last;
+      tmp$_6 = tmp$_3.step;
+      for (var i = tmp$_4; i <= tmp$_5; i += tmp$_6) {
+        tempList.add_11rb$(iterator.next().value);
+      }
+      finalList.add_11rb$(Kotlin.kotlin.collections.copyToArray(tempList));
+      numberOfMatches = numberOfMatches / 2 | 0;
+      if ((counter + 1 | 0) === rounds) {
+        var final = tempList.get_za3lpa$(0);
+        if (Kotlin.isType(final, Partida$Finished))
+          finalList.add_11rb$([new Partida$Winner(final.winnner)]);
+        else
+          finalList.add_11rb$([new Partida$Winner(EQUIPE_TBD)]);
+      }
+    }
+    return JSON.stringify(Kotlin.kotlin.collections.copyToArray(finalList));
   };
   Bracket.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -433,7 +474,7 @@
     var tmp$_0;
     for (tmp$_0 = 0; tmp$_0 !== timesArray.length; ++tmp$_0) {
       var item = timesArray[tmp$_0];
-      destination.add_11rb$(new Equipe(item.nome, item.codigo));
+      destination.add_11rb$(Equipe_init(item.nome, item.codigo));
     }
     var times = toList(destination);
     if (times.size === 2)
@@ -441,10 +482,9 @@
     else {
       var teamsList = toMutableList(times);
       while (teamsList.size % 4 !== 0)
-        teamsList.add_11rb$(new Equipe('W.O', 'WO-' + Kotlin.toString(Math.random())));
+        teamsList.add_11rb$(Equipe_init('WO', 'WO-' + Kotlin.toString(Math.random())));
       var levels = Math.log(teamsList.size / 2) / Math.log(2.0) | 0;
-      var stack = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
-      tmp$ = buildTree(toList(teamsList).iterator(), 0, levels, NodePos$ROOT_getInstance(), stack);
+      tmp$ = buildTree(toList(teamsList).iterator(), 0, levels, NodePos$ROOT_getInstance(), null);
     }
     var root = tmp$;
     return new Bracket(root);
@@ -459,13 +499,9 @@
       }
       var partida = Kotlin.isType(tmp$ = partidaNode.value, Partida$Scheduled) ? tmp$ : Kotlin.throwCCE();
       var finished = new Partida$Finished(partida.equipe1, partida.equipe2, new Resultado(time1Pontos, time2Pontos));
-      if (Kotlin.isType(partidaNode, Tree$Node)) {
-        var $receiver = partidaNode.copy_uvwis1$(void 0, void 0, finished);
-        $receiver.left = partidaNode.left;
-        $receiver.right = partidaNode.right;
-        tmp$_0 = $receiver;
-      }
-       else if (Kotlin.isType(partidaNode, Tree$Leaf))
+      if (Kotlin.isType(partidaNode, Tree$Node))
+        tmp$_0 = partidaNode.fullCopy_11rb$(finished);
+      else if (Kotlin.isType(partidaNode, Tree$Leaf))
         tmp$_0 = partidaNode.copy_uvwis1$(void 0, void 0, finished);
       else
         tmp$_0 = Kotlin.noWhenBranchMatched();
@@ -481,11 +517,8 @@
         if (Kotlin.isType(parent.value, Partida$Empty)) {
           var oldParent = parent;
           if (Kotlin.isType(oldParent.left.value, Partida$Finished) && Kotlin.isType(oldParent.right.value, Partida$Finished)) {
-            var newPartida = new Partida$Scheduled((Kotlin.isType(tmp$_2 = oldParent.left.value, Partida$Finished) ? tmp$_2 : Kotlin.throwCCE()).winnner, (Kotlin.isType(tmp$_3 = oldParent.right.value, Partida$Finished) ? tmp$_3 : Kotlin.throwCCE()).winnner);
-            var $receiver_0 = oldParent.copy_uvwis1$(void 0, void 0, newPartida);
-            $receiver_0.left = oldParent.left;
-            $receiver_0.right = oldParent.right;
-            var newParent = $receiver_0;
+            var newPartida = new Partida$Scheduled((Kotlin.isType(tmp$_2 = oldParent.right.value, Partida$Finished) ? tmp$_2 : Kotlin.throwCCE()).winnner, (Kotlin.isType(tmp$_3 = oldParent.left.value, Partida$Finished) ? tmp$_3 : Kotlin.throwCCE()).winnner);
+            var newParent = oldParent.fullCopy_11rb$(newPartida);
             if (newParent.parent != null) {
               var topNode = newParent.parent;
               if (topNode.left.index === newParent.index)
@@ -520,20 +553,8 @@
     }
   }
   function findMatch(bracket, index) {
-    return findMatch_0(bracket.root, index);
-  }
-  function findMatch_0(node, index) {
-    var tmp$;
-    if (node.index === index)
-      return node;
-    if (Kotlin.isType(node, Tree$Node)) {
-      var left = findMatch_0(node.left, index);
-      var right = findMatch_0(node.right, index);
-      tmp$ = left != null ? left : right;
-    }
-     else
-      tmp$ = null;
-    return tmp$;
+    var list = toList(bracket);
+    return index >= 0 && index < list.size ? list.get_za3lpa$(index) : null;
   }
   function NodePos(name, ordinal, calc) {
     Enum.call(this);
@@ -593,36 +614,40 @@
     }
   }
   NodePos.valueOf_61zpoe$ = NodePos$valueOf;
-  function buildTree(iterator, index, maxTreeHeight, pos, stack) {
-    var tmp$, tmp$_0;
+  function buildTree(iterator, index, maxTreeHeight, pos, parentNode) {
+    var tmp$, tmp$_0, tmp$_1;
     if (index > maxTreeHeight)
       throw new IllegalStateException();
     else if (index === maxTreeHeight) {
-      var parentNode = stack.isEmpty() ? null : stack.get_za3lpa$(0);
-      return new Tree$Leaf(parentNode, pos.calc((tmp$ = parentNode != null ? parentNode.index : null) != null ? tmp$ : 0), new Partida$Scheduled(iterator.next(), iterator.next()));
+      tmp$_1 = new Tree$Leaf(parentNode, pos.calc((tmp$ = parentNode != null ? parentNode.index : null) != null ? tmp$ : 0), new Partida$Scheduled(iterator.next(), iterator.next()));
     }
      else {
-      var parentNode_0 = stack.isEmpty() ? null : stack.get_za3lpa$(0);
-      var node = new Tree$Node(parentNode_0, pos.calc((tmp$_0 = parentNode_0 != null ? parentNode_0.index : null) != null ? tmp$_0 : 0), Partida$Empty_getInstance());
-      stack.add_wxm5ur$(0, node);
-      node.left = buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$LEFT_getInstance(), stack);
-      node.right = buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$RIGHT_getInstance(), stack);
-      stack.removeAt_za3lpa$(0);
-      return node;
+      var node = new Tree$Node(parentNode, pos.calc((tmp$_0 = parentNode != null ? parentNode.index : null) != null ? tmp$_0 : 0), Partida$Empty_getInstance());
+      node.left = buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$LEFT_getInstance(), node);
+      node.right = buildTree(iterator, index + 1 | 0, maxTreeHeight, NodePos$RIGHT_getInstance(), node);
+      tmp$_1 = node;
     }
+    return tmp$_1;
   }
   _.main_kand9s$ = main;
   Tree.Node = Tree$Node;
   Tree.Leaf = Tree$Leaf;
   var package$bracket = _.bracket || (_.bracket = {});
   package$bracket.Tree = Tree;
+  Partida.Winner = Partida$Winner;
   Partida.Finished = Partida$Finished;
   Partida.Scheduled = Partida$Scheduled;
   Object.defineProperty(Partida, 'Empty', {
     get: Partida$Empty_getInstance
   });
   package$bracket.Partida = Partida;
+  Object.defineProperty(package$bracket, 'EQUIPE_TBD', {
+    get: function () {
+      return EQUIPE_TBD;
+    }
+  });
   package$bracket.Resultado = Resultado;
+  package$bracket.Equipe_init_puj7f4$ = Equipe_init;
   package$bracket.Equipe = Equipe;
   package$bracket.Bracket = Bracket;
   package$bracket.bfs_k6352y$ = bfs;
@@ -640,6 +665,7 @@
     get: NodePos$ROOT_getInstance
   });
   package$bracket.NodePos = NodePos;
+  EQUIPE_TBD = Equipe_init('TBD', 'TIME-TBD');
   main([]);
   Kotlin.defineModule('tourney', _);
   return _;
